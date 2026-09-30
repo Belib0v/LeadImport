@@ -1,0 +1,26 @@
+# Credentials come from .env (copy .env.example and fill it in); compose stops if one is missing.
+services:
+  app:
+    build: .
+    ports: ["8080:80"]
+    environment:
+      DB_DSN: mysql:host=db;dbname=${DB_NAME:?set DB_NAME in .env};charset=utf8mb4
+      DB_USER: ${DB_USER:?set DB_USER in .env}
+      DB_PASS: ${DB_PASS:?set DB_PASS in .env}
+    depends_on:
+      db: {condition: service_healthy}
+  db:
+    image: mysql:8.4
+    ports: ["3307:3306"]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      # The app user gets access to this database only, the app never connects as root.
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes: ["./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro"]
+    healthcheck:
+      # TCP: the init-time server listens only on a socket
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u\"$$MYSQL_USER\" -p\"$$MYSQL_PASSWORD\""]
+      interval: 3s
+      retries: 30

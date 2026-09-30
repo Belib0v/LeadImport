@@ -1,0 +1,18 @@
+{
+    "name": "belib0v/lead-import",
+    "description": "Import of leads from .xlsx within max_execution_time",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "ext-dom": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-xmlreader": "*",
+        "ext-zip": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
